@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.9/ref/settings/
 """
 
-import os
 from collections import OrderedDict
+import os
+
+from decouple import Csv, config
 
 
 URL_SRC = "https://github.com/softwaresaved/lowfat"
@@ -28,13 +30,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '_iy7)5@ids_q5m(b4!q$-)ie)&-943zx37$+9-9b#988^*f-+4'
-
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = []
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = config('SECRET_KEY',
+                    default='_iy7)5@ids_q5m(b4!q$-)ie)&-943zx37$+9-9b#988^*f-+4' if DEBUG else None)
+
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=Csv(),
+                       default='*' if DEBUG else '127.0.0.1,localhost,localhost.localdomain')
 
 
 # Application definition
@@ -127,7 +131,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'file': {
-            'level': 'INFO',
+            'level': config('LOG_LEVEL', default='INFO'),
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'lowfat.log'),
             'when': 'W6',
@@ -138,7 +142,7 @@ LOGGING = {
     'loggers': {
         '': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': config('LOG_LEVEL', default='INFO'),
             'propagate': True,
         },
     },
@@ -187,8 +191,8 @@ SOCIAL_AUTH_PIPELINE = (
     'lowfat.auth.wire_profile',
 )
 
-SOCIAL_AUTH_GITHUB_KEY = ''
-SOCIAL_AUTH_GITHUB_SECRET = ''
+SOCIAL_AUTH_GITHUB_KEY = config('SOCIAL_AUTH_GITHUB_KEY', default='')
+SOCIAL_AUTH_GITHUB_SECRET = config('SOCIAL_AUTH_GITHUB_SECRET', default='')
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -244,7 +248,7 @@ SERVER_EMAIL = 'no-reply@software.ac.uk'
 # A list of all the people who get code error notifications.
 ADMINS = [
     ('admin', 'admin@software.ac.uk'),
-    ]
+]
 
 # Subject-line prefix for email messages sent
 EMAIL_SUBJECT_PREFIX = ""

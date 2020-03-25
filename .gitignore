@@ -14,6 +14,7 @@ backups/
 __pycache__
 env/
 venv/
+settings.ini
 
 # IDEs
 .idea/
